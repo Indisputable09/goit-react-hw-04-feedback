@@ -14,37 +14,29 @@ Notiflix.Notify.init({
 });
 
 const Feedback = () => {
-  const [good, setGood] = useState(0);
-  const [neutral, setNeutral] = useState(0);
-  const [bad, setBad] = useState(0);
-
-  const feedbacks = { good, neutral, bad };
+  const [feedback, setFeedback] = useState({
+    good: 0,
+    neutral: 0,
+    bad: 0,
+  });
+  console.log(feedback);
+  // const feedbacks = { good, neutral, bad };
 
   const countTotalFeedback = () => {
-    return good + neutral + bad;
+    return Object.values(feedback).reduce((acc, value) => {
+      return (acc += value);
+    }, 0);
   };
 
   const handleStateClick = feedback => {
     Notiflix.Notify.success(`Thank you for leaving a ${feedback} feedback!`);
-    switch (feedback) {
-      case 'good':
-        setGood(prevState => prevState + 1);
-        break;
-      case 'neutral':
-        setNeutral(prevState => prevState + 1);
-        break;
-      case 'bad':
-        setBad(prevState => prevState + 1);
-        break;
-      default:
-        return;
-    }
+    setFeedback(prev => ({ ...prev, [feedback]: prev[feedback] + 1 }));
   };
 
   const countPositiveFeedbackPercentage = () => {
     const total = countTotalFeedback();
-    if (good !== 0) {
-      const result = (good * 100) / total;
+    if (feedback.good !== 0) {
+      const result = (feedback.good * 100) / total;
       return Math.round(result);
     } else {
       return 0;
@@ -56,12 +48,12 @@ const Feedback = () => {
       <Container>
         <Section title="Please leave feedback">
           <FeedbackOptions
-            options={feedbacks}
+            options={feedback}
             onLeaveFeedback={handleStateClick}
           />
           {countTotalFeedback() > 0 ? (
             <Statistics
-              options={feedbacks}
+              options={feedback}
               total={countTotalFeedback()}
               positivePercentage={countPositiveFeedbackPercentage()}
             />
